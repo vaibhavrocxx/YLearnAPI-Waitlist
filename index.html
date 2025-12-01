@@ -1,247 +1,604 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Join the YLearn API Waitlist</title>
-    
-    <!-- Tailwind CSS for styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- EmailJS SDK -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>YLearn API - Join the Future</title>
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- EmailJS SDK -->
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"
+    ></script>
+
+    <!-- Fonts: Inter & Space Grotesk for that "Dia/Arc" feel -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
 
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc; /* Slate 50 */
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.1) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.1) 0px, transparent 50%);
-            color: #0f172a; /* Slate 900 */
-        }
-        
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05);
-        }
+      :root {
+        --dia-blue: #b8c0da;
+        --dia-accent: #2d3440;
+      }
 
-        /* Loading Spinner Animation */
-        .loader {
-            border: 3px solid rgba(255,255,255,0.3);
-            border-left-color: #ffffff;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-        }
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f3f4f6;
+        overflow: hidden; /* Prevent scrolling */
+        color: #1a1a1a;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+      /* --- NOISE TEXTURE OVERLAY (The "Detailed" look) --- */
+      .noise-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 50;
+        opacity: 0.04;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      }
 
-        .fade-in {
-            animation: fadeIn 0.5s ease-out forwards;
-        }
+      /* --- AURORA MESH GRADIENT --- */
+      .aurora-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 0;
+        background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+        overflow: hidden;
+      }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+      .aurora-blob {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.8;
+        animation: float 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+        will-change: transform;
+      }
+
+      /* Using the Dia-ish colors */
+      .blob-1 {
+        top: -10%;
+        left: -10%;
+        width: 60vw;
+        height: 60vw;
+        background: #e0e7ff;
+        animation-delay: 0s;
+      } /* Soft Indigo */
+      .blob-2 {
+        bottom: -20%;
+        right: -10%;
+        width: 70vw;
+        height: 70vw;
+        background: #b8c0da;
+        animation-delay: -5s;
+      } /* Dia Blue-Grey */
+      .blob-3 {
+        top: 40%;
+        left: 30%;
+        width: 50vw;
+        height: 50vw;
+        background: #fce7f3;
+        animation-delay: -10s;
+      } /* Soft Pink */
+      .blob-4 {
+        bottom: 10%;
+        left: -20%;
+        width: 40vw;
+        height: 40vw;
+        background: #dbeafe;
+        animation-delay: -15s;
+      } /* Soft Blue */
+
+      @keyframes float {
+        0% {
+          transform: translate(0, 0) scale(1) rotate(0deg);
         }
+        50% {
+          transform: translate(30px, 20px) scale(1.05) rotate(5deg);
+        }
+        100% {
+          transform: translate(-20px, 50px) scale(0.95) rotate(-5deg);
+        }
+      }
+
+      /* --- MAIN CARD & TYPOGRAPHY --- */
+      .content-wrapper {
+        position: relative;
+        z-index: 10;
+        width: 100%;
+        max-width: 600px;
+        padding: 2rem;
+      }
+
+      h1,
+      h2 {
+        font-family: "Space Grotesk", sans-serif;
+        letter-spacing: -0.02em;
+      }
+
+      /* The Typeform-style Input */
+      .dia-input-group {
+        position: relative;
+        margin-top: 2rem;
+        margin-bottom: 3rem;
+      }
+
+      .dia-input {
+        width: 100%;
+        background: transparent;
+        border: none;
+        border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+        padding: 1rem 0;
+        font-size: 2rem; /* Big, bold text */
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 500;
+        color: #111827;
+        outline: none;
+        transition: border-color 0.3s ease, transform 0.3s ease;
+      }
+
+      .dia-input:focus {
+        border-bottom-color: #000000;
+      }
+
+      .dia-input::placeholder {
+        color: rgba(0, 0, 0, 0.25);
+      }
+
+      /* The "Next" Button */
+      .dia-btn {
+        background: #000000;
+        color: #ffffff;
+        font-family: "Inter", sans-serif;
+        font-weight: 600;
+        font-size: 1.125rem;
+        padding: 1rem 2.5rem;
+        border-radius: 99px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .dia-btn:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        background: #1a1a1a;
+      }
+
+      .dia-btn:active {
+        transform: scale(0.98);
+      }
+
+      /* --- ANIMATIONS --- */
+      .step-transition {
+        transition: opacity 0.5s ease,
+          transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      .hidden-step {
+        opacity: 0;
+        pointer-events: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        transform: translateY(20px);
+      }
+
+      .active-step {
+        opacity: 1;
+        pointer-events: auto;
+        position: relative;
+        transform: translateY(0);
+      }
+
+      /* Status Badge */
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        background: rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        border-radius: 99px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #4b5563;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+        transition: transform 0.3s ease;
+      }
+
+      .status-pill:hover {
+        transform: scale(1.02);
+        background: rgba(255, 255, 255, 0.8);
+      }
+
+      .pulse-dot {
+        width: 8px;
+        height: 8px;
+        background-color: #10b981;
+        border-radius: 50%;
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+        animation: pulse-green 2s infinite;
+      }
+
+      @keyframes pulse-green {
+        0% {
+          transform: scale(0.95);
+          box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+        }
+        70% {
+          transform: scale(1);
+          box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+        }
+        100% {
+          transform: scale(0.95);
+          box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+        }
+      }
+
+      /* Key hint visual */
+      .key-hint {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 24px;
+        height: 24px;
+        padding: 0 6px;
+        background: #e5e7eb;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        color: #6b7280;
+        margin-left: 8px;
+        font-family: sans-serif;
+        border-bottom: 2px solid #d1d5db;
+      }
     </style>
-</head>
-<body class="min-h-screen flex items-center justify-center p-4">
+  </head>
+  <body>
+    <!-- VISUAL LAYERS -->
+    <div class="noise-overlay"></div>
 
-    <main class="w-full max-w-md">
-        <!-- Logo / Branding Area -->
-        <div class="text-center mb-8 fade-in">
-            <!-- 
-                LOGO IMAGE
-                Updated path: "logo.png" assumes the file is in the same folder as index.html
-            -->
-            <img 
-                src="logo.png" 
-                alt="Company Logo" 
-                class="w-20 h-20 mx-auto rounded-2xl mb-4 shadow-lg shadow-sky-500/20 object-cover"
-                onerror="this.src='https://placehold.co/150x150/0ea5e9/ffffff?text=Logo'"
+    <div class="aurora-container">
+      <div class="aurora-blob blob-1"></div>
+      <div class="aurora-blob blob-2"></div>
+      <div class="aurora-blob blob-3"></div>
+      <div class="aurora-blob blob-4"></div>
+    </div>
+
+    <!-- MAIN INTERFACE -->
+    <main class="content-wrapper">
+      <!-- STEP 1: LANDING -->
+      <div id="step1" class="step-transition active-step text-center">
+        <!-- Floating Logo -->
+        <div class="mb-8 relative inline-block group">
+          <div
+            class="absolute inset-0 bg-blue-400 blur-2xl opacity-20 group-hover:opacity-30 transition-opacity duration-500 rounded-full"
+          ></div>
+          <img
+            src="logo.png"
+            alt="YLearn Logo"
+            class="w-24 h-24 mx-auto relative z-10 rounded-2xl shadow-2xl object-cover transform transition-transform duration-500 group-hover:scale-105 group-hover:rotate-3"
+            onerror="this.src='https://placehold.co/150x150/111827/ffffff?text=Y'"
+          />
+        </div>
+
+        <h1
+          class="text-5xl md:text-6xl font-bold text-slate-900 mb-6 tracking-tight leading-tight"
+        >
+          Meet YLearn.
+        </h1>
+
+        <p
+          class="text-xl md:text-2xl text-slate-500 mb-12 max-w-lg mx-auto font-light leading-relaxed"
+        >
+          The intelligence layer for your next big idea. <br />
+          <span class="text-slate-400"
+            >Join the waitlist for early access.</span
+          >
+        </p>
+
+        <button onclick="nextStep(2)" class="dia-btn">Join the Waitlist</button>
+
+        <div class="mt-16 fade-in">
+          <div class="status-pill">
+            <span class="pulse-dot"></span>
+            <span>289+ businesses already in line</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: NAME -->
+      <div id="step2" class="step-transition hidden-step">
+        <div class="text-left max-w-lg mx-auto">
+          <div
+            class="text-slate-400 text-sm font-medium mb-4 uppercase tracking-widest"
+          >
+            Step 1 of 2
+          </div>
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
+            First off, what's your name?
+          </h2>
+          <p class="text-slate-500 text-lg">
+            We like to know who we're talking to.
+          </p>
+
+          <div class="dia-input-group">
+            <input
+              type="text"
+              id="nameInput"
+              class="dia-input"
+              placeholder="Type your name..."
+              onkeypress="handleEnter(event, 3)"
+              autocomplete="off"
+            />
+          </div>
+
+          <div class="flex items-center gap-4">
+            <button onclick="nextStep(3)" class="dia-btn text-lg px-8">
+              OK
+              <span class="text-white/50 text-sm ml-2 font-normal"
+                >press Enter ↵</span
+              >
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3: EMAIL -->
+      <div id="step3" class="step-transition hidden-step">
+        <div class="text-left max-w-lg mx-auto">
+          <div
+            class="text-slate-400 text-sm font-medium mb-4 uppercase tracking-widest"
+          >
+            Step 2 of 2
+          </div>
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
+            Where should we send your invite?
+          </h2>
+          <p class="text-slate-500 text-lg">
+            No spam. Just your API key when it's ready.
+          </p>
+
+          <div class="dia-input-group">
+            <input
+              type="email"
+              id="emailInput"
+              class="dia-input"
+              placeholder="name@company.com"
+              onkeypress="handleEnter(event, 'submit')"
+              autocomplete="off"
+            />
+          </div>
+
+          <div class="flex flex-col items-start gap-4">
+            <button
+              id="submitBtn"
+              onclick="submitForm()"
+              class="dia-btn text-lg px-8"
             >
-            
-            <h1 class="text-3xl font-bold tracking-tight text-slate-900">YLearn API</h1>
-            <p class="mt-2 text-slate-500">The next generation of learning intelligence.</p>
+              Submit
+              <span class="text-white/50 text-sm ml-2 font-normal"
+                >press Enter ↵</span
+              >
+            </button>
+            <div
+              id="errorMessage"
+              class="hidden text-red-600 text-sm font-medium bg-red-50 px-3 py-2 rounded-lg border border-red-100"
+            ></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4: SUCCESS -->
+      <div id="step4" class="step-transition hidden-step text-center">
+        <div
+          class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner"
+        >
+          <svg
+            class="w-12 h-12 text-green-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2.5"
+              d="M5 13l4 4L19 7"
+            ></path>
+          </svg>
         </div>
 
-        <!-- Card Container -->
-        <div class="glass-panel rounded-2xl p-6 sm:p-8 fade-in" style="animation-delay: 0.1s;">
-            
-            <!-- FORM STATE -->
-            <form id="waitlistForm" class="space-y-5">
-                <div>
-                    <label for="name" class="block text-sm font-medium text-slate-700 mb-1.5">Full Name</label>
-                    <input type="text" id="name" name="name" required 
-                        class="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-slate-900 placeholder-slate-400 transition-all outline-none shadow-sm"
-                        placeholder="Elon Musk">
-                </div>
+        <h1 class="text-4xl md:text-5xl font-bold text-slate-900 mb-6">
+          You're on the list!
+        </h1>
 
-                <div>
-                    <label for="email" class="block text-sm font-medium text-slate-700 mb-1.5">Email Address</label>
-                    <input type="email" id="email" name="email" required 
-                        class="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-slate-900 placeholder-slate-400 transition-all outline-none shadow-sm"
-                        placeholder="elon@spacex.com">
-                </div>
+        <p class="text-xl text-slate-500 mb-8 max-w-md mx-auto leading-relaxed">
+          We've reserved your spot. Watch your inbox
+          <span
+            class="text-slate-900 font-medium bg-slate-100 px-2 py-0.5 rounded"
+            id="finalEmailDisplay"
+          ></span>
+          for updates.
+        </p>
 
-                <button type="submit" id="submitBtn" 
-                    class="w-full py-3.5 px-4 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-semibold rounded-lg shadow-md shadow-sky-500/20 transition-all transform active:scale-[0.98] flex justify-center items-center gap-2">
-                    <span>Join the Waitlist</span>
-                </button>
-                
-                <p class="text-xs text-center text-slate-500 mt-4">
-                    We respect your inbox. No spam, ever.
-                </p>
-            </form>
-
-            <!-- SUCCESS STATE (Hidden by default) -->
-            <div id="successMessage" class="hidden text-center py-4">
-                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                </div>
-                <h3 class="text-xl font-bold text-slate-900 mb-2">You're on the list!</h3>
-                <p class="text-slate-600 mb-6">We've sent a confirmation email to <span id="userEmailDisplay" class="text-sky-600 font-medium"></span>.</p>
-            </div>
-
-            <!-- ERROR STATE (Hidden by default) -->
-            <div id="errorMessage" class="hidden mt-4 p-3 bg-red-50 border border-red-100 rounded-lg text-red-600 text-sm text-center break-words">
-                Something went wrong. Please try again.
-            </div>
-
+        <div class="status-pill mt-4">
+          <span class="text-green-600 font-bold">✓</span>
+          <span>Priority Access Reserved</span>
         </div>
+      </div>
     </main>
 
     <script>
-        // ==========================================
-        // CONFIGURATION: REPLACE THESE VALUES
-        // ==========================================
-        
-        const EMAILJS_PUBLIC_KEY = "aE_wcLQQrPmim1h9t"; 
-        const EMAILJS_SERVICE_ID = "service_4jcudig"; 
-        const EMAILJS_TEMPLATE_ID = "template_4j32ybq"; 
+      // === CONFIGURATION ===
+      const EMAILJS_PUBLIC_KEY = "aE_wcLQQrPmim1h9t";
+      const EMAILJS_SERVICE_ID = "service_4jcudig";
+      const EMAILJS_TEMPLATE_ID = "template_4j32ybq";
 
-        // ==========================================
-        // INITIALIZATION
-        // ==========================================
-        
-        const isConfigured = EMAILJS_PUBLIC_KEY !== "YOUR_PUBLIC_KEY";
+      // === INIT ===
+      if (EMAILJS_PUBLIC_KEY !== "YOUR_PUBLIC_KEY")
+        emailjs.init(EMAILJS_PUBLIC_KEY);
 
-        if(isConfigured) {
-            emailjs.init(EMAILJS_PUBLIC_KEY);
-        } else {
-            console.log("⚠️ EmailJS is not configured yet. Running in simulation mode.");
+      // === STATE & DOM ===
+      let currentStepId = 1;
+      const formData = { name: "", email: "" };
+
+      const steps = [1, 2, 3, 4].map((id) =>
+        document.getElementById(`step${id}`)
+      );
+      const nameInput = document.getElementById("nameInput");
+      const emailInput = document.getElementById("emailInput");
+      const submitBtn = document.getElementById("submitBtn");
+      const errorMessage = document.getElementById("errorMessage");
+      const finalEmailDisplay = document.getElementById("finalEmailDisplay");
+
+      // === NAVIGATION ===
+      function showStep(targetId) {
+        // Hide all
+        steps.forEach((el) => {
+          el.classList.remove("active-step");
+          el.classList.add("hidden-step");
+        });
+
+        // Show target
+        const target = document.getElementById(`step${targetId}`);
+        target.classList.remove("hidden-step");
+
+        // Small delay to allow display:block to apply before opacity transition
+        setTimeout(() => {
+          target.classList.add("active-step");
+        }, 50);
+
+        currentStepId = targetId;
+
+        // Auto-focus logic
+        if (targetId === 2) setTimeout(() => nameInput.focus(), 300);
+        if (targetId === 3) setTimeout(() => emailInput.focus(), 300);
+      }
+
+      function nextStep(targetId) {
+        // Validation Step 2 (Name)
+        if (currentStepId === 2) {
+          if (!nameInput.value.trim()) {
+            shakeInput(nameInput);
+            return;
+          }
+          formData.name = nameInput.value.trim();
         }
+        showStep(targetId);
+      }
 
-        // ==========================================
-        // LOGIC
-        // ==========================================
+      function handleEnter(e, action) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          if (action === "submit") submitForm();
+          else nextStep(action);
+        }
+      }
 
-        const form = document.getElementById('waitlistForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const successMessage = document.getElementById('successMessage');
-        const errorMessage = document.getElementById('errorMessage');
-        const userEmailDisplay = document.getElementById('userEmailDisplay');
+      // === UTILS ===
+      function shakeInput(input) {
+        input.parentElement.classList.add("animate-pulse");
+        input.style.borderBottomColor = "#ef4444";
+        setTimeout(() => {
+          input.parentElement.classList.remove("animate-pulse");
+          input.style.borderBottomColor = "rgba(0,0,0,0.1)";
+        }, 500);
+      }
 
-        // Check if user has already joined (LocalStorage)
-        const checkExistingRegistration = () => {
-            const hasJoined = localStorage.getItem('ylearn_waitlist_joined');
-            const storedEmail = localStorage.getItem('ylearn_waitlist_email');
+      // === SUBMISSION ===
+      function submitForm() {
+        // Validate Email
+        const emailVal = emailInput.value.trim();
+        if (!emailVal || !emailVal.includes("@")) {
+          shakeInput(emailInput);
+          errorMessage.textContent = "Please enter a valid email address.";
+          errorMessage.classList.remove("hidden");
+          return;
+        }
+        formData.email = emailVal;
 
-            if (hasJoined === 'true') {
-                form.classList.add('hidden');
-                if (storedEmail) {
-                    userEmailDisplay.textContent = storedEmail;
-                }
-                successMessage.classList.remove('hidden');
-            }
+        // Loading UI
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `
+                <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Processing...
+            `;
+        errorMessage.classList.add("hidden");
+
+        const finish = () => {
+          finalEmailDisplay.textContent = formData.email;
+          localStorage.setItem("ylearn_waitlist_joined", "true");
+          localStorage.setItem("ylearn_waitlist_email", formData.email);
+          showStep(4);
         };
 
-        // Run check on load
-        checkExistingRegistration();
+        const fail = (err) => {
+          console.error(err);
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = `Try Again <span class="text-white/50 text-sm ml-2 font-normal">press Enter ↵</span>`;
+          errorMessage.textContent =
+            "Connection failed. Please check your internet.";
+          errorMessage.classList.remove("hidden");
+        };
 
-        form.addEventListener('submit', function(event) {
-            event.preventDefault();
+        if (EMAILJS_PUBLIC_KEY !== "YOUR_PUBLIC_KEY") {
+          emailjs
+            .send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+              to_name: formData.name,
+              to_email: formData.email,
+              reply_to: formData.email,
+            })
+            .then(finish)
+            .catch(fail);
+        } else {
+          // Sim mode
+          setTimeout(finish, 1500);
+        }
+      }
 
-            // UI: Set Loading State
-            const originalBtnText = submitBtn.innerHTML;
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<div class="loader"></div>';
-            errorMessage.classList.add('hidden');
-
-            // Collect Data
-            const formData = {
-                name: document.getElementById('name').value,
-                email: document.getElementById('email').value
-            };
-
-            // Function to handle success UI
-            const showSuccess = () => {
-                form.classList.add('hidden');
-                userEmailDisplay.textContent = formData.email;
-                successMessage.classList.remove('hidden');
-                successMessage.classList.add('fade-in');
-                
-                // Save to Local Storage
-                localStorage.setItem('ylearn_waitlist_joined', 'true');
-                localStorage.setItem('ylearn_waitlist_email', formData.email);
-            };
-
-            // Function to handle error UI
-            const showError = (errorText, isConfigError) => {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalBtnText;
-                
-                if (isConfigError) {
-                     errorMessage.innerHTML = `<strong>Setup Required:</strong><br>${errorText}`;
-                } else {
-                     errorMessage.innerHTML = errorText;
-                }
-                errorMessage.classList.remove('hidden');
-            };
-
-            // SEND EMAIL
-            if (isConfigured) {
-                // Real Email Sending
-                emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-                    to_name: formData.name,
-                    to_email: formData.email, // This MUST match the "To Email" field in your template settings as {{to_email}}
-                    reply_to: formData.email
-                })
-                .then(function() {
-                    showSuccess();
-                }, function(error) {
-                    console.error('FAILED...', error);
-                    
-                    // SMART ERROR HANDLING
-                    // This checks for the specific 422 error you saw in the console
-                    if (error.text && error.text.includes("recipients address is empty")) {
-                        showError("Go to EmailJS Dashboard -> Email Templates -> Settings.<br>Set 'To Email' to: <code>{{to_email}}</code>", true);
-                    } else {
-                        showError("Something went wrong. Please check your internet connection.", false);
-                    }
-                });
-            } else {
-                // Simulation Mode (for testing UI without keys)
-                setTimeout(() => {
-                    console.log(`[SIMULATION] Sending email to ${formData.email} for ${formData.name}`);
-                    showSuccess();
-                }, 1500);
-            }
-        });
+      // === ON LOAD ===
+      window.addEventListener("load", () => {
+        if (localStorage.getItem("ylearn_waitlist_joined") === "true") {
+          formData.email = localStorage.getItem("ylearn_waitlist_email");
+          finalEmailDisplay.textContent = formData.email;
+          showStep(4);
+        } else {
+          // Initial fade in for step 1
+          setTimeout(() => {
+            document.getElementById("step1").classList.add("active-step");
+          }, 100);
+        }
+      });
     </script>
-</body>
+  </body>
 </html>
